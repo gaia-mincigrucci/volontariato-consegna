@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donazione</title>
+  <link rel="stylesheet" href="stile.css"/>
+</head>
+<body>
+
+<ul id="menu">
+  <li><a href="index.html">HOME</a></li>
+  <li><a href="unisciti.html">UNISCITI A NOI</a></li>
+  <li><a href="contatto.html">CONTATTI</a></li>
+  <li><a href="facciamo.html">COSA FACCIAMO</a></li>
+  <li><a class="active" href="donazione.html">DONAZIONE</a></li>
+</ul>
+
+<div class="content">
+  <h1>DONAZIONE</h1>
+
+  <div class="form-container">
+    <form action="donazione_email.php" method="post">
+      <input type="text" name="metodo" placeholder="Metodo Pagamento" required><br>
+      <input type="text" name="numero_carta" placeholder="Numero Carta" required><br>
+      <input type="email" name="email" placeholder="Inserisci E-mail" required><br>
+      <input type="password" name="pwd" placeholder="Password" required><br>
+      <br>
+      <button type="submit">EFFETTUA DONAZIONE </button>
+      <input type="reset" value="RIPRISTINA">
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>
+

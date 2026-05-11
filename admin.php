@@ -1,49 +1,37 @@
 <?php
 session_start();
-require 'db.php';
-if(!isset($_SESSION['admin'])) { header("Location: login.php"); exit; }
+if ($_SESSION['ruolo'] !== 'admin') { header("Location: login.php"); exit; }
+require 'database.php';
 
-// Gestione Eliminazione
-if(isset($_GET['delete'])) {
-    $stmt = $pdo->prepare("DELETE FROM utenti WHERE id = ?");
-    $stmt->execute([$_GET['delete']]);
+if (isset($_GET['del'])) {
+    $pdo->prepare("DELETE FROM utenti WHERE id = ?")->execute([$_GET['del']]);
 }
 
-$stmt = $pdo->query("SELECT * FROM utenti");
-$utenti = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$utenti = $pdo->query("SELECT * FROM utenti")->fetchAll();
 ?>
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-    <meta charset="UTF-8">
     <link rel="stylesheet" href="stile.css">
-    <title>Dashboard Admin</title>
-    <style>
-        table { width: 80%; margin: 20px auto; border-collapse: collapse; background: white; }
-        th, td { border: 1px solid #ddd; padding: 12px; }
-        th { background-color: #001F4D; color: white; }
-    </style>
+    <title>Admin</title>
 </head>
 <body>
     <div class="content">
-        <h1>PANNELLO DI CONTROLLO</h1>
-        <table>
-            <tr>
-                <th>Nome</th><th>Cognome</th><th>Email</th><th>Azioni</th>
-            </tr>
+        <h1>GESTIONE UTENTI</h1>
+        <table border="1" style="width:100%; background:white;">
+            <tr><th>Nome</th><th>Email</th><th>Azioni</th></tr>
             <?php foreach($utenti as $u): ?>
             <tr>
-                <td><?= htmlspecialchars($u['nome']) ?></td>
-                <td><?= htmlspecialchars($u['cognome']) ?></td>
-                <td><?= htmlspecialchars($u['email']) ?></td>
+                <td><?= $u['nome'] ?></td>
+                <td><?= $u['email'] ?></td>
                 <td>
                     <a href="modifica.php?id=<?= $u['id'] ?>">📝</a>
-                    <a href="admin.php?delete=<?= $u['id'] ?>" onclick="return confirm('Eliminare?')">🗑️</a>
+                    <a href="admin.php?del=<?= $u['id'] ?>">❌</a>
                 </td>
             </tr>
             <?php endforeach; ?>
         </table>
-        <button onclick="window.location='login.php'">LOGOUT</button>
+        <a href="login.php">Logout</a>
     </div>
 </body>
 </html>

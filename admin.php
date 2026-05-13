@@ -2,7 +2,7 @@
 session_start();
 require 'database.php';
 
-// Controllo Sicurezza: Solo Gaia (Admin) può stare qui
+// Controllo Sicurezza: Solo l'Admin può accedere
 if (!isset($_SESSION['ruolo']) || $_SESSION['ruolo'] !== 'admin') {
     header("Location: login.php");
     exit;
@@ -10,40 +10,48 @@ if (!isset($_SESSION['ruolo']) || $_SESSION['ruolo'] !== 'admin') {
 
 $messaggio = "";
 
-// --- OPERAZIONE: DELETE (Elimina Utente) ---
-if (isset($_GET['delete'])) {
-    $id = $_GET['delete'];
+// --- 1. LOGICA DI ELIMINAZIONE (DELETE) ---
+if (isset($_GET['delete_u'])) {
     $stmt = $pdo->prepare("DELETE FROM utenti WHERE id = ?");
-    if ($stmt->execute([$id])) {
-        $messaggio = "Utente eliminato con successo!";
-    }
+    if ($stmt->execute([$_GET['delete_u']])) $messaggio = "Utente eliminato!";
+}
+if (isset($_GET['delete_p'])) {
+    $stmt = $pdo->prepare("DELETE FROM prenotazioni WHERE id = ?");
+    if ($stmt->execute([$_GET['delete_p']])) $messaggio = "Prenotazione eliminata!";
+}
+if (isset($_GET['delete_d'])) {
+    $stmt = $pdo->prepare("DELETE FROM donazioni WHERE id = ?");
+    if ($stmt->execute([$_GET['delete_d']])) $messaggio = "Record donazione eliminato!";
 }
 
-// --- OPERAZIONE: UPDATE (Modifica Utente) ---
-if (isset($_POST['update'])) {
-    $id = $_POST['id'];
-    $nome = $_POST['nome'];
-    $cognome = $_POST['cognome'];
-    $email = $_POST['email'];
-    $ruolo = $_POST['ruolo'];
-
-    $stmt = $pdo->prepare("UPDATE utenti SET nome = ?, cognome = ?, email = ?, ruolo = ? WHERE id = ?");
-    if ($stmt->execute([$nome, $cognome, $email, $ruolo, $id])) {
-        $messaggio = "Dati aggiornati correttamente!";
-    }
+// --- 2. LOGICA DI AGGIORNAMENTO (UPDATE) ---
+if (isset($_POST['update_utente'])) {
+    $stmt = $pdo->prepare("UPDATE utenti SET nome=?, cognome=?, email=?, ruolo=? WHERE id=?");
+    if ($stmt->execute([$_POST['nome'], $_POST['cognome'], $_POST['email'], $_POST['ruolo'], $_POST['id']])) $messaggio = "Utente aggiornato!";
+}
+if (isset($_POST['update_prenotazione'])) {
+    $stmt = $pdo->prepare("UPDATE prenotazioni SET attivita=?, data_prenotazione=?, orario=? WHERE id=?");
+    if ($stmt->execute([$_POST['attivita'], $_POST['data'], $_POST['orario'], $_POST['id']])) $messaggio = "Prenotazione modificata!";
+}
+if (isset($_POST['update_donazione'])) {
+    $stmt = $pdo->prepare("UPDATE donazioni SET importo=?, metodo=? WHERE id=?");
+    if ($stmt->execute([$_POST['importo'], $_POST['metodo'], $_POST['id']])) $messaggio = "Donazione aggiornata!";
 }
 
-// --- OPERAZIONE: READ (Leggi tutti gli utenti) ---
-$stmt = $pdo->query("SELECT * FROM utenti WHERE ruolo != 'admin' ORDER BY id DESC");
-$utenti = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// --- 3. RECUPERO DATI PER LE TABELLE ---
+$utenti = $pdo->query("SELECT * FROM utenti WHERE ruolo != 'admin' ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+try { $prenotazioni = $pdo->query("SELECT * FROM prenotazioni ORDER BY data_prenotazione DESC")->fetchAll(PDO::FETCH_ASSOC); } catch (Exception $e) { $prenotazioni = []; }
+try { $donazioni = $pdo->query("SELECT * FROM donazioni ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC); } catch (Exception $e) { $donazioni = []; }
 
-// Se è stata richiesta la modifica di un utente specifico, carichiamo i suoi dati nel form
-$utente_da_modificare = null;
-if (isset($_GET['edit'])) {
-    $stmt = $pdo->prepare("SELECT * FROM utenti WHERE id = ?");
-    $stmt->execute([$_GET['edit']]);
-    $utente_da_modificare = $stmt->fetch();
-}
+// --- 4. RECUPERO DATI PER I FORM DI MODIFICA ---
+$u_mod = isset($_GET['edit_u']) ? ($pdo->prepare("SELECT * FROM utenti WHERE id=?") ?: null) : null;
+if($u_mod) { $u_mod->execute([$_GET['edit_u']]); $u_mod = $u_mod->fetch(); }
+
+$p_mod = isset($_GET['edit_p']) ? ($pdo->prepare("SELECT * FROM prenotazioni WHERE id=?") ?: null) : null;
+if($p_mod) { $p_mod->execute([$_GET['edit_p']]); $p_mod = $p_mod->fetch(); }
+
+$d_mod = isset($_GET['edit_d']) ? ($pdo->prepare("SELECT * FROM donazioni WHERE id=?") ?: null) : null;
+if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
 ?>
 
 <!DOCTYPE html>
@@ -51,78 +59,130 @@ if (isset($_GET['edit'])) {
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="stile.css">
-    <title>Dashboard Admin - Associazione</title>
+    <title>Admin Dashboard - Gaia</title>
     <style>
-        /* Stili specifici per la tabella admin */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
         th { background-color: #001F4D; color: white; }
-        tr:hover { background-color: #f1f1f1; }
-        .btn-edit { color: #0047AB; text-decoration: none; font-weight: bold; margin-right: 10px; }
-        .btn-delete { color: #d9534f; text-decoration: none; font-weight: bold; }
-        .alert { padding: 10px; background: #d4edda; color: #155724; border-radius: 5px; margin-bottom: 20px; width: 100%; text-align: center; }
+        .box { width: 95%; max-width: 1100px; margin-bottom: 60px; padding: 25px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .alert { padding: 15px; background: #d4edda; color: #155724; border-radius: 5px; margin-bottom: 25px; width: 95%; text-align: center; font-weight: bold; }
+        h2 { color: #001F4D; border-bottom: 2px solid #001F4D; padding-bottom: 10px; margin-top: 0; }
+        .edit-form { background: #eef4ff; border: 2px solid #0047AB; padding: 25px; border-radius: 10px; margin-bottom: 40px; width: 95%; max-width: 1100px; }
+        .btn-del { color: #d9534f; text-decoration: none; font-weight: bold; margin-left: 10px; }
+        .btn-edit { color: #0047AB; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <?php include 'menu.php'; ?>
 
     <div class="content">
-        <h1>GESTIONE VOLONTARI E UTENTI</h1>
+        <h1>PANNELLO AMMINISTRATORE</h1>
 
         <?php if ($messaggio): ?>
             <div class="alert"><?= $messaggio ?></div>
         <?php endif; ?>
 
-        <?php if ($utente_da_modificare): ?>
-        <div class="box" style="margin-bottom: 40px; border: 2px solid #0047AB;">
-            <h3>MODIFICA UTENTE: <?= $utente_da_modificare['nome'] ?></h3>
-            <form method="POST" action="admin.php">
-                <input type="hidden" name="id" value="<?= $utente_da_modificare['id'] ?>">
-                <input type="text" name="nome" value="<?= $utente_da_modificare['nome'] ?>" required>
-                <input type="text" name="cognome" value="<?= $utente_da_modificare['cognome'] ?>" required>
-                <input type="email" name="email" value="<?= $utente_da_modificare['email'] ?>" required>
-                <select name="ruolo" style="width: 100%; padding: 10px; margin: 10px 0;">
-                    <option value="utente" <?= $utente_da_modificare['ruolo'] == 'utente' ? 'selected' : '' ?>>Utente</option>
-                    <option value="volontario" <?= $utente_da_modificare['ruolo'] == 'volontario' ? 'selected' : '' ?>>Volontario</option>
+        <?php if ($u_mod): ?>
+        <div class="edit-form">
+            <h3>📝 MODIFICA UTENTE: <?= htmlspecialchars($u_mod['nome']) ?></h3>
+            <form method="POST">
+                <input type="hidden" name="id" value="<?= $u_mod['id'] ?>">
+                <input type="text" name="nome" value="<?= htmlspecialchars($u_mod['nome']) ?>" required>
+                <input type="text" name="cognome" value="<?= htmlspecialchars($u_mod['cognome']) ?>" required>
+                <input type="email" name="email" value="<?= htmlspecialchars($u_mod['email']) ?>" required>
+                <select name="ruolo">
+                    <option value="utente" <?= $u_mod['ruolo']=='utente'?'selected':'' ?>>Utente</option>
+                    <option value="volontario" <?= $u_mod['ruolo']=='volontario'?'selected':'' ?>>Volontario</option>
                 </select>
-                <button type="submit" name="update">SALVA MODIFICHE</button>
-                <a href="admin.php" style="display: block; margin-top: 10px; color: gray;">Annulla</a>
+                <button type="submit" name="update_utente">SALVA MODIFICHE</button>
+                <a href="admin.php" style="color:gray; margin-left:15px;">Annulla</a>
             </form>
         </div>
         <?php endif; ?>
 
-        <div class="box" style="width: 95%; max-width: 1100px;">
-            <h3>ELENCO ISCRITTI</h3>
+        <?php if ($p_mod): ?>
+        <div class="edit-form">
+            <h3>📝 MODIFICA PRENOTAZIONE #<?= $p_mod['id'] ?></h3>
+            <form method="POST">
+                <input type="hidden" name="id" value="<?= $p_mod['id'] ?>">
+                <input type="text" name="attivita" value="<?= htmlspecialchars($p_mod['attivita']) ?>" required>
+                <input type="date" name="data" value="<?= $p_mod['data_prenotazione'] ?>" required>
+                <input type="time" name="orario" value="<?= $p_mod['orario'] ?>" required>
+                <button type="submit" name="update_prenotazione">SALVA PRENOTAZIONE</button>
+                <a href="admin.php" style="color:gray; margin-left:15px;">Annulla</a>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($d_mod): ?>
+        <div class="edit-form">
+            <h3>📝 MODIFICA DONAZIONE #<?= $d_mod['id'] ?></h3>
+            <form method="POST">
+                <input type="hidden" name="id" value="<?= $d_mod['id'] ?>">
+                <input type="number" name="importo" value="<?= $d_mod['importo'] ?>" required>
+                <input type="text" name="metodo" value="<?= htmlspecialchars($d_mod['metodo']) ?>" required>
+                <button type="submit" name="update_donazione">SALVA DONAZIONE</button>
+                <a href="admin.php" style="color:gray; margin-left:15px;">Annulla</a>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <div class="box">
+            <h2>feELENCO UTENTI</h2>
             <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Cognome</th>
-                        <th>Email</th>
-                        <th>Ruolo</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($utenti as $u): ?>
-                    <tr>
-                        <td><?= $u['id'] ?></td>
-                        <td><?= $u['nome'] ?></td>
-                        <td><?= $u['cognome'] ?></td>
-                        <td><?= $u['email'] ?></td>
-                        <td><strong><?= strtoupper($u['ruolo']) ?></strong></td>
-                        <td>
-                            <a href="admin.php?edit=<?= $u['id'] ?>" class="btn-edit">📝 Modifica</a>
-                            <a href="admin.php?delete=<?= $u['id'] ?>" class="btn-delete" onclick="return confirm('Sei sicura di voler eliminare questo utente?')">❌ Elimina</a>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
+                <tr><th>Nome</th><th>Cognome</th><th>Email</th><th>Ruolo</th><th>Azioni</th></tr>
+                <?php foreach ($utenti as $u): ?>
+                <tr>
+                    <td><?= htmlspecialchars($u['nome']) ?></td>
+                    <td><?= htmlspecialchars($u['cognome']) ?></td>
+                    <td><?= htmlspecialchars($u['email']) ?></td>
+                    <td><strong><?= strtoupper($u['ruolo']) ?></strong></td>
+                    <td>
+                        <a href="admin.php?edit_u=<?= $u['id'] ?>" class="btn-edit">📝 Modifica</a>
+                        <a href="admin.php?delete_u=<?= $u['id'] ?>" class="btn-del" onclick="return confirm('Eliminare questo utente?')">❌ Elimina</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+
+        <div class="box">
+            <h2>PRENOTAZIONI</h2>
+            <table>
+                <tr><th>Utente</th><th>Attività</th><th>Data</th><th>Orario</th><th>Azioni</th></tr>
+                <?php foreach ($prenotazioni as $p): ?>
+                <tr>
+                    <td><?= htmlspecialchars($p['utente_email']) ?></td>
+                    <td><?= htmlspecialchars($p['attivita']) ?></td>
+                    <td><?= $p['data_prenotazione'] ?></td>
+                    <td><?= $p['orario'] ?></td>
+                    <td>
+                        <a href="admin.php?edit_p=<?= $p['id'] ?>" class="btn-edit">📝 Modifica</a>
+                        <a href="admin.php?delete_p=<?= $p['id'] ?>" class="btn-del" onclick="return confirm('Eliminare questa prenotazione?')">❌ Elimina</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+
+        <div class="box">
+            <h2>💰 DONAZIONI RICEVUTE</h2>
+            <table>
+                <tr><th>Email</th><th>Importo</th><th>Metodo</th><th>Data</th><th>Azioni</th></tr>
+                <?php foreach ($donazioni as $d): ?>
+                <tr>
+                    <td><?= htmlspecialchars($d['email']) ?></td>
+                    <td><?= $d['importo'] ?> €</td>
+                    <td><?= htmlspecialchars($d['metodo']) ?></td>
+                    <td><?= $d['data_donazione'] ?></td>
+                    <td>
+                        <a href="admin.php?edit_d=<?= $d['id'] ?>" class="btn-edit">📝 Modifica</a>
+                        <a href="admin.php?delete_d=<?= $d['id'] ?>" class="btn-del" onclick="return confirm('Eliminare questo record?')">❌ Elimina</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
             </table>
         </div>
     </div>
-
 </body>
 </html>

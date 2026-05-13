@@ -20,11 +20,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'gaia.mincigrucci@gmail.com'; 
-        $mail->Password = 'nsvnjbzscpbpdcse'; 
-        $mail->SMTPSecure = 'tls';
+        $mail->Password = 'etyo lqeo miux bxvy'; 
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
         $mail->setFrom('gaia.mincigrucci@gmail.com', 'Associazione Gaia');
         $mail->addAddress($_POST['email']);
+        $mail->SMTPOptions = array(
+        'ssl' => array(
+        'verify_peer' => false,
+        'verify_peer_name' => false,
+        'allow_self_signed' => true
+    )
+);
         $mail->Subject = 'Benvenuto!';
         $mail->Body = "Ciao " . $_POST['nome'] . ", registrazione avvenuta!";
         $mail->send();

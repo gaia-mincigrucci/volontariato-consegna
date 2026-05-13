@@ -16,7 +16,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'gaia.mincigrucci@gmail.com';
-        $mail->Password = 'nsvnjbzscpbpdcse';
+        $mail->Password = 'etyo lqeo miux bxvy';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
@@ -38,11 +38,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $mail->send();
 
-        //header("Location: conferma_donazione.html");
+        header("Location: conferma_donazione.php");
         exit;
 
     } catch (Exception $e) {
-        //header("Location: errore_donazione.html");
+        header("Location: errore_donazione.php");
             echo "Errore nell'invio dell'email: {$mail->ErrorInfo}";
         exit;
     }

@@ -8,3 +8,18 @@ body { font-family: Arial; background-color: #f0f4f8; margin: 0; padding: 0; }
 input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
 button { background: #001F4D; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; width: 100%; }
 table th, table td { padding: 15px; border-bottom: 1px solid #ddd; text-align: left; }
+.box { 
+    margin-bottom: 40px; /* Spazio sotto ogni box */
+    padding: 30px;       /* Spazio interno al box */
+}
+
+/* Distanzia le tabelle dai titoli h2 */
+h2 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Distanzia il contenuto generale dal menu in alto */
+.content {
+    padding-top: 40px;
+}

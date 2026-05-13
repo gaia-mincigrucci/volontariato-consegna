@@ -12,9 +12,9 @@
   <h1>VOLONTARIATO ANIMALE</h1>
   <h2>L'ASSOCIAZIONE DEGLI ANIMALI</h2>
 
-  <div class="box-container">
+  <div class="content">
     <img src="https://via.placeholder.com/400x300.png?text=Animali" alt="Animali">
-    <div class="text">
+    <div class="box">
       <h2>CHE COS'È IL VOLONTARIATO ANIMALE</h2>
       <p>
         Il volontariato animale significa aiutare gli animali, prendendosi cura di loro e difendendo i loro diritti. Chi sceglie di fare volontariato con gli animali può occuparsi di diverse attività, tra cui:

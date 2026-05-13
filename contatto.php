@@ -10,7 +10,7 @@
 <?php include 'menu.php'; ?>
 <div class="content">
   <h1>CONTATTI</h1>
-  <div class="form-container">
+  <div class="box">
     <p><strong>ASSOCIAZIONE DI VOLONTARIATO DEGLI ANIMALI</strong></p>
     <h3>DOVE SIAMO E CHI SIAMO</h3>
     <p>

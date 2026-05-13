@@ -6,6 +6,7 @@ if (!isset($_SESSION['ruolo'])) { header("Location: login.php"); exit; }
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stile.css">
     <title>Prenotazione</title>
 </head>
@@ -17,7 +18,7 @@ if (!isset($_SESSION['ruolo'])) { header("Location: login.php"); exit; }
             <p>Benvenuto nell'area prenotazioni. Scegli una data per venire a trovarci.</p>
             <form action="conferma_prenotazione.php" method="POST">
                 <input type="date" name="data_visita" required>
-                <button type="submit">INVIA PRENOTAZIONE</button>
+                <button type="submit" class="btn-blue">INVIA PRENOTAZIONE</button>
             </form>
         </div>
     </div>

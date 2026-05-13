@@ -7,7 +7,7 @@
         <?php if ($_SESSION['ruolo'] === 'admin'): ?>
             <li><a href="admin.php">AREA ADMIN</a></li>
         <?php else: ?>
-            <li><a href="area_utente.php">AREA RISERVATA</a></li>
+            <li><a href="area_utente.php">AREA PERSONALE</a></li>
         <?php endif; ?>
         <li><a href="logout.php">LOGOUT</a></li>
     <?php else: ?>

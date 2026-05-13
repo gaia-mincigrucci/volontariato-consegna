@@ -3,72 +3,61 @@ session_start();
 require 'database.php';
 
 // Protezione: solo utenti loggati
-if(!isset($_SESSION['ruolo'])) {
+if (!isset($_SESSION['ruolo'])) {
     header("Location: login.php");
-    exit();
+    exit;
 }
 
-$messaggio = "";
-
-// Salvataggio nel Database
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_SESSION['email'];
     $attivita = $_POST['attivita'];
     $data = $_POST['data'];
     $orario = $_POST['orario'];
-    $email = $_SESSION['email']; // Prendiamo l'email dalla sessione
 
-    $sql = "INSERT INTO prenotazioni (utente_email, attivita, data_prenotazione, orario) VALUES (?, ?, ?, ?)";
-    $stmt = $pdo->prepare($sql);
-    
-    if ($stmt->execute([$email, $attivita, $data, $orario])) {
-        $messaggio = "Prenotazione salvata con successo!";
-    } else {
-        $messaggio = "Errore durante il salvataggio.";
+    try {
+        // Inseriamo la prenotazione nel database
+        $stmt = $pdo->prepare("INSERT INTO prenotazioni (utente_email, attivita, data_prenotazione, orario) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$email, $attivita, $data, $orario]);
+        
+        // Se l'inserimento riesce, andiamo alla pagina di conferma
+        header("Location: conferma_prenotazione.php");
+        exit;
+    } catch (PDOException $e) {
+        $errore = "Ops! Qualcosa è andato storto: " . $e->getMessage();
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stile.css">
-    <title>Prenota Volontariato</title>
+    <title>Prenota Visita</title>
 </head>
 <body>
     <?php include 'menu.php'; ?>
-
     <div class="content">
-        <h1>PRENOTA IL TUO TURNO</h1>
-        
+        <h1>PRENOTA UNA VISITA</h1>
         <div class="box">
-            <?php if($messaggio) echo "<p style='color:green'>$messaggio</p>"; ?>
+            <?php if(isset($errore)) echo "<div class='alert'>" . htmlspecialchars($errore) . "</div>"; ?>
+            <p>Scegli quando venire a trovarci in associazione.</p>
             
-            <form method="POST" action="prenotazione.php">
-                <label>Scegli l'attività:</label>
+            <form method="POST">
+                <label>Cosa vuoi fare?</label>
                 <select name="attivita" required>
-                    <option value="">-- Seleziona --</option>
-                    <option value="Canile">Canile (Passeggiate e pulizia)</option>
-                    <option value="Gattile">Gattile (Cura e pappa)</option>
-                    <option value="Soccorso">Soccorso Animali</option>
-                    <option value="Evento">Banchetto Informativo</option>
-                </select>
-                <br>
-                <br>
-                <br>
-                <label>Data:</label>
-                <input type="date" name="data" required>
-                <br>
-                <br>
-                <br>
-                <label>Orario:</label>
-                <select name="orario" required>
-                    <option value="09:00">Mattina (09:00 - 12:00)</option>
-                    <option value="15:00">Pomeriggio (15:00 - 18:00)</option>
-                    <option value="20:00">Sera (20:00 - 22:00)</option>
+                    <option value="Visita Rifugio">Visita al Rifugio</option>
+                    <option value="Volontariato">Giornata da Volontario</option>
+                    <option value="Tempo insieme agli animali">Tempo con gli animali</option>
                 </select>
 
-                <button type="submit" style="margin-top: 20px;">CONFERMA PRENOTAZIONE</button>
+                <label>Scegli il giorno:</label>
+                <input type="date" name="data" required>
+
+                <label>Scegli l'orario:</label>
+                <input type="time" name="orario" required>
+
+                <button type="submit" class="btn-blue">CONFERMA PRENOTAZIONE</button>
             </form>
         </div>
     </div>

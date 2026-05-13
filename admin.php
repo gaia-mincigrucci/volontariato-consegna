@@ -58,6 +58,7 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stile.css">
     <title>Admin Dashboard - Gaia</title>
     <style>
@@ -94,8 +95,8 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
                     <option value="utente" <?= $u_mod['ruolo']=='utente'?'selected':'' ?>>Utente</option>
                     <option value="volontario" <?= $u_mod['ruolo']=='volontario'?'selected':'' ?>>Volontario</option>
                 </select>
-                <button type="submit" name="update_utente">SALVA MODIFICHE</button>
-                <a href="admin.php" style="color:gray; margin-left:15px;">Annulla</a>
+                <button type="submit" name="update_utente" class="btn-blue">SALVA MODIFICHE</button>
+                <a href="admin.php" class="cancel-link">Annulla</a>
             </form>
         </div>
         <?php endif; ?>
@@ -108,8 +109,8 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
                 <input type="text" name="attivita" value="<?= htmlspecialchars($p_mod['attivita']) ?>" required>
                 <input type="date" name="data" value="<?= $p_mod['data_prenotazione'] ?>" required>
                 <input type="time" name="orario" value="<?= $p_mod['orario'] ?>" required>
-                <button type="submit" name="update_prenotazione">SALVA PRENOTAZIONE</button>
-                <a href="admin.php" style="color:gray; margin-left:15px;">Annulla</a>
+                <button type="submit" name="update_prenotazione" class="btn-blue">SALVA PRENOTAZIONE</button>
+                <a href="admin.php" class="cancel-link">Annulla</a>
             </form>
         </div>
         <?php endif; ?>
@@ -121,8 +122,8 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
                 <input type="hidden" name="id" value="<?= $d_mod['id'] ?>">
                 <input type="number" name="importo" value="<?= $d_mod['importo'] ?>" required>
                 <input type="text" name="metodo" value="<?= htmlspecialchars($d_mod['metodo']) ?>" required>
-                <button type="submit" name="update_donazione">SALVA DONAZIONE</button>
-                <a href="admin.php" style="color:gray; margin-left:15px;">Annulla</a>
+                <button type="submit" name="update_donazione" class="btn-blue">SALVA DONAZIONE</button>
+                <a href="admin.php" class="cancel-link">Annulla</a>
             </form>
         </div>
         <?php endif; ?>
@@ -166,7 +167,7 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
         </div>
 
         <div class="box">
-            <h2>💰 DONAZIONI RICEVUTE</h2>
+            <h2>DONAZIONI RICEVUTE</h2>
             <table>
                 <tr><th>Email</th><th>Importo</th><th>Metodo</th><th>Data</th><th>Azioni</th></tr>
                 <?php foreach ($donazioni as $d): ?>

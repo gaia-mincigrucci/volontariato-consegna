@@ -13,18 +13,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="stile.css">
+    <title>Modifica Utente</title>
 </head>
 <body>
+    <?php include 'menu.php'; ?>
+
     <div class="content">
-        <form method="post" class="form-container">
-            <input type="text" name="nome" value="<?= $utente['nome'] ?>">
-            <input type="text" name="cognome" value="<?= $utente['cognome'] ?>">
-            <input type="email" name="email" value="<?= $utente['email'] ?>">
-            <button type="submit">SALVA</button>
-        </form>
+        <h1>MODIFICA UTENTE</h1>
+        <div class="form-container">
+            <form method="post">
+                <label>Nome</label>
+                <input type="text" name="nome" value="<?= htmlspecialchars($utente['nome']) ?>" required>
+                <label>Cognome</label>
+                <input type="text" name="cognome" value="<?= htmlspecialchars($utente['cognome']) ?>" required>
+                <label>Email</label>
+                <input type="email" name="email" value="<?= htmlspecialchars($utente['email']) ?>" required>
+                <button type="submit" class="btn-blue">SALVA</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

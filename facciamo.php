@@ -8,13 +8,7 @@
 </head>
 <body>
 
-<ul id="menu">
-  <li><a href="index.html">HOME</a></li>
-  <li><a href="unisciti.html">UNISCITI A NOI</a></li>
-  <li><a href="contatto.html">CONTATTI</a></li>
-  <li><a class="active" href="facciamo.html">COSA FACCIAMO</a></li>
-  <li><a href="donazione.html">DONAZIONE</a></li>
-</ul>
+<?php include 'menu.php'; ?>
 
 <div class="content">
   <h1>L'ASSOCIAZIONE DEGLI ANIMALI</h1>

@@ -7,7 +7,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $pwd = $_POST['pwd'];
 
     // 1. ACCESSO ADMIN (Email esatta che hai nel tuo codice)
-    if($email == "gaia.mincigrucci@gmail.com" && $pwd == "admin123") {
+    if($email == "gaia.mincigrucci@gmail.com" && $pwd == "123") {
         $_SESSION['admin'] = true;
         $_SESSION['ruolo'] = 'admin';
         header("Location: admin.php");
@@ -38,17 +38,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Login</title>
 </head>
 <body>
-    <ul id="menu">
-        <li><a href="home.php">HOME</a></li>
-        <li><a href="facciamo.html">COSA FACCIAMO</a></li>
-        <li><a href="contatto.html">CONTATTI</a></li>
-        <?php if(!isset($_SESSION['ruolo'])): ?>
-            <li><a class="active" href="login.php">LOGIN</a></li>
-        <?php else: ?>
-            <li><a href="area_utente.php">AREA RISERVATA</a></li>
-            <li><a href="login.php">LOGOUT</a></li>
-        <?php endif; ?>
-    </ul>
+       <?php include 'menu.php'; ?>
 
     <div class="content">
         <h1>ACCESSO</h1>
@@ -58,7 +48,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="password" name="pwd" placeholder="Password" required><br>
                 <button type="submit">ACCEDI</button>
             </form>
-            <p>Non hai un account? <a href="unisciti.html">Registrati qui</a></p>
+            <p>Non hai un account? <a href="unisciti.php">Registrati qui</a></p>
         </div>
     </div>
 </body>

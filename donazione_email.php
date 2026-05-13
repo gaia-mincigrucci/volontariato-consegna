@@ -6,9 +6,8 @@ require __DIR__ . '/vendor/autoload.php';
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     $metodo = $_POST['metodo'];
-    $numero_carta = $_POST['numero_carta'];
     $email = $_POST['email'];
-    $pwd = $_POST['pwd'];
+    //$pwd = $_POST['pwd'];
 
     $mail = new PHPMailer(true);
 
@@ -39,11 +38,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $mail->send();
 
-        header("Location: conferma_donazione.html");
+        //header("Location: conferma_donazione.html");
         exit;
 
     } catch (Exception $e) {
-        header("Location: errore_donazione.html");
+        //header("Location: errore_donazione.html");
+            echo "Errore nell'invio dell'email: {$mail->ErrorInfo}";
         exit;
     }
 } else {

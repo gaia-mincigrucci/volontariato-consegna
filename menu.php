@@ -1,4 +1,4 @@
-﻿
+﻿//verifica la variabile di sessione ruolo e in base a che valore ha ti fa vedere un menu diverso
 <ul id="menu">
     <li><a href="home.php">HOME</a></li>
     <li><a href="facciamo.php">COSA FACCIAMO</a></li>

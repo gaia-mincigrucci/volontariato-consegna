@@ -1,24 +1,23 @@
 <?php
 session_start();
-require 'database.php'; // CORRETTO: punta a database.php
-
+require 'database.php'; 
+//prende i dati dal login
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $pwd = $_POST['pwd'];
 
-    // 1. ACCESSO ADMIN (Email esatta che hai nel tuo codice)
+    // accedere ad admin solo se si ha email e password uguali 
     if($email == "gaia.mincigrucci@gmail.com" && $pwd == "123") {
         $_SESSION['admin'] = true;
         $_SESSION['ruolo'] = 'admin';
         header("Location: admin.php");
         exit;
     }
-
-    // 2. ACCESSO UTENTE (Con verifica password sicura)
+    //controllo se l'utente si è registrato e vede se ha inserito pawd e email giusti
     $stmt = $pdo->prepare("SELECT * FROM utenti WHERE email = :email");
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch();
-
+    //crea variabili di sessione
     if ($user && password_verify($pwd, $user['pwd'])) {
         $_SESSION['ruolo'] = 'utente';
         $_SESSION['nome'] = $user['nome'];
@@ -55,6 +54,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
     <script>
+    //funzione per salvare i dati su json
     function salvainjson() {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
@@ -71,7 +71,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
       return false;
     }
 
-    // 3. LOGICA JSON COME RICHIESTO
     const dati = {
         email: email,
         password: password,

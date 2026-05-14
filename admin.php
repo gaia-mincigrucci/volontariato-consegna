@@ -9,49 +9,65 @@ if (!isset($_SESSION['ruolo']) || $_SESSION['ruolo'] !== 'admin') {
 }
 
 $messaggio = "";
-
-// --- 1. LOGICA DI ELIMINAZIONE (DELETE) ---
+//elimina utente
 if (isset($_GET['delete_u'])) {
     $stmt = $pdo->prepare("DELETE FROM utenti WHERE id = ?");
     if ($stmt->execute([$_GET['delete_u']])) $messaggio = "Utente eliminato!";
 }
+//elimina prenotazione
 if (isset($_GET['delete_p'])) {
     $stmt = $pdo->prepare("DELETE FROM prenotazioni WHERE id = ?");
     if ($stmt->execute([$_GET['delete_p']])) $messaggio = "Prenotazione eliminata!";
 }
+//elimina donazione
 if (isset($_GET['delete_d'])) {
     $stmt = $pdo->prepare("DELETE FROM donazioni WHERE id = ?");
     if ($stmt->execute([$_GET['delete_d']])) $messaggio = "Record donazione eliminato!";
 }
-
-// --- 2. LOGICA DI AGGIORNAMENTO (UPDATE) ---
+// modifica utente
 if (isset($_POST['update_utente'])) {
     $stmt = $pdo->prepare("UPDATE utenti SET nome=?, cognome=?, email=?, ruolo=? WHERE id=?");
     if ($stmt->execute([$_POST['nome'], $_POST['cognome'], $_POST['email'], $_POST['ruolo'], $_POST['id']])) $messaggio = "Utente aggiornato!";
 }
+// modifica prenotazione
 if (isset($_POST['update_prenotazione'])) {
     $stmt = $pdo->prepare("UPDATE prenotazioni SET attivita=?, data_prenotazione=?, orario=? WHERE id=?");
     if ($stmt->execute([$_POST['attivita'], $_POST['data'], $_POST['orario'], $_POST['id']])) $messaggio = "Prenotazione modificata!";
 }
+// modifica donazione
 if (isset($_POST['update_donazione'])) {
     $stmt = $pdo->prepare("UPDATE donazioni SET importo=?, metodo=? WHERE id=?");
     if ($stmt->execute([$_POST['importo'], $_POST['metodo'], $_POST['id']])) $messaggio = "Donazione aggiornata!";
 }
 
-// --- 3. RECUPERO DATI PER LE TABELLE ---
 $utenti = $pdo->query("SELECT * FROM utenti WHERE ruolo != 'admin' ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
-try { $prenotazioni = $pdo->query("SELECT * FROM prenotazioni ORDER BY data_prenotazione DESC")->fetchAll(PDO::FETCH_ASSOC); } catch (Exception $e) { $prenotazioni = []; }
-try { $donazioni = $pdo->query("SELECT * FROM donazioni ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC); } catch (Exception $e) { $donazioni = []; }
+try {
+    $prenotazioni = $pdo->query("SELECT * FROM prenotazioni ORDER BY data_prenotazione DESC")->fetchAll(PDO::FETCH_ASSOC); 
+} catch (Exception $e) {
+    $prenotazioni = []; 
+}
+try {
+    $donazioni = $pdo->query("SELECT * FROM donazioni ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC); 
+} catch (Exception $e) { 
+    $donazioni = []; 
+}
 
-// --- 4. RECUPERO DATI PER I FORM DI MODIFICA ---
+//recupero dati per la modifica
 $u_mod = isset($_GET['edit_u']) ? ($pdo->prepare("SELECT * FROM utenti WHERE id=?") ?: null) : null;
-if($u_mod) { $u_mod->execute([$_GET['edit_u']]); $u_mod = $u_mod->fetch(); }
+if($u_mod) {
+    $u_mod->execute([$_GET['edit_u']]); 
+    $u_mod = $u_mod->fetch();
+}
 
 $p_mod = isset($_GET['edit_p']) ? ($pdo->prepare("SELECT * FROM prenotazioni WHERE id=?") ?: null) : null;
-if($p_mod) { $p_mod->execute([$_GET['edit_p']]); $p_mod = $p_mod->fetch(); }
+if($p_mod) {
+    $p_mod->execute([$_GET['edit_p']]); $p_mod = $p_mod->fetch();
+}
 
 $d_mod = isset($_GET['edit_d']) ? ($pdo->prepare("SELECT * FROM donazioni WHERE id=?") ?: null) : null;
-if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
+if($d_mod) {
+    $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); 
+}
 ?>
 
 <!DOCTYPE html>
@@ -75,7 +91,7 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
 </head>
 <body>
     <?php include 'menu.php'; ?>
-
+//tabelle utenti e tabelle per le modifiche
     <div class="content">
         <h1>PANNELLO AMMINISTRATORE</h1>
 
@@ -85,7 +101,7 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
 
         <?php if ($u_mod): ?>
         <div class="edit-form">
-            <h3>📝 MODIFICA UTENTE: <?= htmlspecialchars($u_mod['nome']) ?></h3>
+            <h3>MODIFICA UTENTE: <?= htmlspecialchars($u_mod['nome']) ?></h3>
             <form method="POST">
                 <input type="hidden" name="id" value="<?= $u_mod['id'] ?>">
                 <input type="text" name="nome" value="<?= htmlspecialchars($u_mod['nome']) ?>" required>
@@ -103,7 +119,7 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
 
         <?php if ($p_mod): ?>
         <div class="edit-form">
-            <h3>📝 MODIFICA PRENOTAZIONE #<?= $p_mod['id'] ?></h3>
+            <h3>MODIFICA PRENOTAZIONE #<?= $p_mod['id'] ?></h3>
             <form method="POST">
                 <input type="hidden" name="id" value="<?= $p_mod['id'] ?>">
                 <input type="text" name="attivita" value="<?= htmlspecialchars($p_mod['attivita']) ?>" required>
@@ -117,7 +133,7 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
 
         <?php if ($d_mod): ?>
         <div class="edit-form">
-            <h3>📝 MODIFICA DONAZIONE #<?= $d_mod['id'] ?></h3>
+            <h3>MODIFICA DONAZIONE #<?= $d_mod['id'] ?></h3>
             <form method="POST">
                 <input type="hidden" name="id" value="<?= $d_mod['id'] ?>">
                 <input type="number" name="importo" value="<?= $d_mod['importo'] ?>" required>
@@ -129,7 +145,7 @@ if($d_mod) { $d_mod->execute([$_GET['edit_d']]); $d_mod = $d_mod->fetch(); }
         <?php endif; ?>
 
         <div class="box">
-            <h2>feELENCO UTENTI</h2>
+            <h2>ELENCO UTENTI</h2>
             <table>
                 <tr><th>Nome</th><th>Cognome</th><th>Email</th><th>Ruolo</th><th>Azioni</th></tr>
                 <?php foreach ($utenti as $u): ?>

@@ -7,6 +7,7 @@ if (!isset($_SESSION['ruolo'])) {
 }
 
 $errore = '';
+//prende i dati dalla prenotazione
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_SESSION['email'];
     $attivita = $_POST['attivita'] ?? 'Prenotazione visita';
@@ -17,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errore = 'La data della prenotazione è obbligatoria.';
     } else {
         try {
+            //inserisce i valori presi nel db
             $stmt = $pdo->prepare('INSERT INTO prenotazioni (utente_email, attivita, data_prenotazione, orario) VALUES (?, ?, ?, ?)');
             $stmt->execute([$email, $attivita, $data, $orario]);
         } catch (PDOException $e) {

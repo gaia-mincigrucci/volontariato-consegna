@@ -15,11 +15,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $orario = $_POST['orario'];
 
     try {
-        // Inseriamo la prenotazione nel database
+        // inserimento prenotazione
         $stmt = $pdo->prepare("INSERT INTO prenotazioni (utente_email, attivita, data_prenotazione, orario) VALUES (?, ?, ?, ?)");
         $stmt->execute([$email, $attivita, $data, $orario]);
-        
-        // Se l'inserimento riesce, andiamo alla pagina di conferma
         header("Location: conferma_prenotazione.php");
         exit;
     } catch (PDOException $e) {
@@ -36,13 +34,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Prenota Visita</title>
 </head>
 <body>
+    //menu per prenotare
     <?php include 'menu.php'; ?>
     <div class="content">
         <h1>PRENOTA UNA VISITA</h1>
         <div class="box">
             <?php if(isset($errore)) echo "<div class='alert'>" . htmlspecialchars($errore) . "</div>"; ?>
             <p>Scegli quando venire a trovarci in associazione.</p>
-            
             <form method="POST">
                 <label>Cosa vuoi fare?</label>
                 <select name="attivita" required>
@@ -50,13 +48,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <option value="Volontariato">Giornata da Volontario</option>
                     <option value="Tempo insieme agli animali">Tempo con gli animali</option>
                 </select>
-
                 <label>Scegli il giorno:</label>
                 <input type="date" name="data" required>
-
                 <label>Scegli l'orario:</label>
                 <input type="time" name="orario" required>
-
                 <button type="submit" class="btn-blue">CONFERMA PRENOTAZIONE</button>
             </form>
         </div>

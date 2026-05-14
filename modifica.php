@@ -1,11 +1,13 @@
 <?php
 session_start();
 require 'database.php';
+//cerca per id gli utenti
 $id = $_GET['id'];
 $u = $pdo->prepare("SELECT * FROM utenti WHERE id = ?");
 $u->execute([$id]);
 $utente = $u->fetch();
 
+//modfica dati
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "UPDATE utenti SET nome=?, cognome=?, email=? WHERE id=?";
     $pdo->prepare($sql)->execute([$_POST['nome'], $_POST['cognome'], $_POST['email'], $id]);
@@ -22,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <?php include 'menu.php'; ?>
-
+    //form per la modifica degli utenti
     <div class="content">
         <h1>MODIFICA UTENTE</h1>
         <div class="form-container">

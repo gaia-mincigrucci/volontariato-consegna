@@ -9,6 +9,7 @@
 <body>
 <div class="content">
   <h1>REGISTRATI</h1>
+  //form per registrare utenti
   <div class="form-container">
     <form action="invia_email.php" method="post">
       <input type="text" name="nome" placeholder="Nome" required><br>

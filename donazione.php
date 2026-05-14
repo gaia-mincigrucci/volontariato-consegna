@@ -15,6 +15,7 @@ if (!isset($_SESSION['ruolo'])) { header("Location: login.php"); exit; }
     <div class="content">
         <h1>FAI UNA DONAZIONE</h1>
         <div class="box">
+            //form per donare
             <p>Il tuo contributo aiuta i nostri piccoli amici.</p>
             <form action="donazione_email.php" method="POST">
                 <input type="email" name="email" placeholder="La tua email" required>

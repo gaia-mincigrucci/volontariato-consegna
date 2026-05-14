@@ -10,7 +10,7 @@ if (!isset($_SESSION['ruolo'])) {
     header('Location: login.php');
     exit;
 }
-
+//prende i valori dalla donazione 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $metodo = $_POST['metodo'] ?? '';
     $email = $_POST['email'] ?? $_SESSION['email'] ?? '';
@@ -22,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     try {
+        //inserisce i valori presi nel db
         $stmt = $pdo->prepare("INSERT INTO donazioni (email, importo, metodo, data_donazione) VALUES (?, ?, ?, NOW())");
         $stmt->execute([$email, $importo, $metodo]);
     } catch (PDOException $e) {
@@ -32,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail = new PHPMailer(true);
 
     try {
+        //manda l'email 
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
